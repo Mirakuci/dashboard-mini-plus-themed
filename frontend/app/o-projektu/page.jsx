@@ -1,26 +1,23 @@
 export default function Page() {
   return (
     <main className="container py-4">
-      <h1 className="mb-3">O projektu</h1>
+      <h1>O projektu</h1>
 
       <p className="text-muted">
-        Ukázkový full-stack dashboard pro analytiku a KPI metriky.
+        Tento dashboard je ukázkový projekt vytvořený pomocí moderních technologií:
       </p>
 
-      <div className="card shadow-sm">
-        <div className="card-body">
-          <h5 className="card-title">Technologie</h5>
-          <ul className="mb-0">
-            <li>Frontend: Next.js 15, React, Bootstrap</li>
-            <li>Backend: FastAPI (Python)</li>
-            <li>Grafy: Recharts</li>
-            <li>API: REST (proxy přes Next.js)</li>
-          </ul>
-        </div>
-      </div>
+      <ul>
+        <li>Next.js 15 (frontend)</li>
+        <li>FastAPI (backend API)</li>
+        <li>Recharts (grafy)</li>
+        <li>Bootstrap (layout)</li>
+      </ul>
 
-      <p className="mt-3">
-        Dashboard zobrazuje KPI (users, revenue, orders, conversion) včetně trendů a časovou řadu návštěvnosti.
+      <p>
+        Dashboard zobrazuje KPI metriky, trendy a analytická data z backend API.
+        Projekt demonstruje schopnost vytvořit plnohodnotnou webovou aplikaci
+        včetně frontend, backend a integrace API.
       </p>
     </main>
   )

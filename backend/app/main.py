@@ -1,50 +1,48 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .email_utils import send_mail
 
-app = FastAPI(title="dashboard-api")
+app = FastAPI(title="Dashboard API", version="1.0.0")
 
-# CORS – povolí frontend na localhost:3000
+# Pro jistotu při vývoji (když bys někdy volal backend přímo z FE):
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=True,
 )
 
-# =========================
-# STATS endpoint (graf)
-# =========================
-@app.get("/api/stats")
-def stats():
-    return [
-        {"day": f"D{i}", "visits": v}
-        for i, v in enumerate(
-            [120, 160, 90, 200, 180, 240, 300, 260, 190, 220],
-            start=1,
-        )
-    ]
+KPI_DATA = {
+    "users": {"value": 1284, "trend": 12.5},
+    "revenue": {"value": 84520, "trend": 8.2},
+    "orders": {"value": 312, "trend": -3.1},
+    "conversion": {"value": 3.8, "trend": 1.4},
+}
+
+STATS_DATA = [
+    {"day": "D1", "visits": 120},
+    {"day": "D2", "visits": 160},
+    {"day": "D3", "visits": 90},
+    {"day": "D4", "visits": 200},
+    {"day": "D5", "visits": 180},
+    {"day": "D6", "visits": 240},
+    {"day": "D7", "visits": 300},
+    {"day": "D8", "visits": 260},
+    {"day": "D9", "visits": 190},
+    {"day": "D10", "visits": 220},
+]
 
 
-# =========================
-# KPI endpoint (value + trend)
-# =========================
+@app.get("/health")
+def health():
+    return {"ok": True}
+
+
 @app.get("/api/kpi")
 def get_kpi():
-    return {
-        "users": {"value": 1284, "trend": 12.5},
-        "revenue": {"value": 84520, "trend": 8.2},   # Kč
-        "orders": {"value": 312, "trend": -3.1},
-        "conversion": {"value": 3.8, "trend": 1.4},  # %
-    }
+    return KPI_DATA
 
 
-# =========================
-# Feedback endpoint
-# =========================
-@app.post("/api/feedback")
-async def feedback(req: Request):
-    data = await req.json()
-    send_mail(subject="Nová zpětná vazba", body=str(data))
-    return {"ok": True}
+@app.get("/api/stats")
+def get_stats():
+    return STATS_DATA
