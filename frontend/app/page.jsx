@@ -1,203 +1,133 @@
-'use client'
-
-import { useEffect, useMemo, useState } from 'react'
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  ResponsiveContainer,
-  CartesianGrid
-} from 'recharts'
-
-function formatNumber(n) {
-  return new Intl.NumberFormat('cs-CZ').format(n)
-}
-
-function formatCurrencyCZK(n) {
-  return new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' }).format(n)
-}
-
-function getKpiValue(kpiItem, fallback = 0) {
-  if (kpiItem == null) return fallback
-  if (typeof kpiItem === 'number') return kpiItem
-  if (typeof kpiItem === 'object' && 'value' in kpiItem) return Number(kpiItem.value) || fallback
-  return fallback
-}
-
-function getKpiTrend(kpiItem) {
-  if (kpiItem == null) return null
-  if (typeof kpiItem === 'object' && 'trend' in kpiItem) {
-    const t = Number(kpiItem.trend)
-    return Number.isFinite(t) ? t : null
-  }
-  return null
-}
-
-function Trend({ value }) {
-  if (value == null) return null
-  const isUp = value >= 0
-  const color = isUp ? '#22c55e' : '#ef4444'
-  const arrow = isUp ? '↑' : '↓'
-
-  return (
-    <div style={{ color, fontSize: '0.9rem', marginTop: 6 }}>
-      {arrow} {Math.abs(value)}%
-    </div>
-  )
-}
+import Link from 'next/link'
 
 export default function Page() {
-  const [stats, setStats] = useState([])
-  const [kpi, setKpi] = useState({
-    users: { value: 0, trend: 0 },
-    revenue: { value: 0, trend: 0 },
-    orders: { value: 0, trend: 0 },
-    conversion: { value: 0, trend: 0 }
-  })
-  const [loading, setLoading] = useState(true)
-
-  useEffect(() => {
-    let alive = true
-
-    async function load() {
-      try {
-        const [statsRes, kpiRes] = await Promise.all([
-          fetch('/api/stats'),
-          fetch('/api/kpi')
-        ])
-
-        const [statsData, kpiData] = await Promise.all([
-          statsRes.json(),
-          kpiRes.json()
-        ])
-
-        if (!alive) return
-
-        setStats(Array.isArray(statsData) ? statsData : [])
-        setKpi(kpiData || kpi)
-      } catch (e) {
-        console.error('Load error:', e)
-      } finally {
-        if (alive) setLoading(false)
-      }
-    }
-
-    load()
-    return () => { alive = false }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const average = useMemo(() => {
-    if (!stats.length) return 0
-    const sum = stats.reduce((s, i) => s + (Number(i.visits) || 0), 0)
-    return Math.round(sum / stats.length)
-  }, [stats])
-
-  const usersValue = getKpiValue(kpi.users, 0)
-  const usersTrend = getKpiTrend(kpi.users)
-
-  const revenueValue = getKpiValue(kpi.revenue, 0)
-  const revenueTrend = getKpiTrend(kpi.revenue)
-
-  const ordersValue = getKpiValue(kpi.orders, 0)
-  const ordersTrend = getKpiTrend(kpi.orders)
-
-  const convValue = getKpiValue(kpi.conversion, 0)
-  const convTrend = getKpiTrend(kpi.conversion)
-
   return (
-    <main className="container py-4">
-      <h1 className="mb-4">Dashboard (demo)</h1>
-
-      {/* KPI CARDS */}
-      <div className="row g-3 mb-4">
-        <div className="col-6 col-md-3">
-          <div className="card shadow border-0 h-100">
-            <div className="card-body" style={{ padding: '14px 16px' }}>
-              <div className="text-muted small" style={{ letterSpacing: '.2px' }}>Users</div>
-              <div className="fs-4 fw-bold" style={{ lineHeight: 1.1 }}>
-                {loading ? '…' : formatNumber(usersValue)}
+    <main className="container py-5">
+      <div className="row justify-content-center">
+        <div className="col-lg-10">
+          <div
+            className="card shadow border-0"
+            style={{
+              background:
+                'linear-gradient(135deg, rgba(2,6,23,0.96), rgba(15,23,42,0.96))',
+              color: 'white',
+              borderRadius: '24px',
+              overflow: 'hidden'
+            }}
+          >
+            <div className="card-body p-4 p-md-5">
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 10,
+                  padding: '8px 14px',
+                  borderRadius: 999,
+                  background: 'rgba(59,130,246,0.14)',
+                  color: '#93c5fd',
+                  fontWeight: 700,
+                  fontSize: '0.95rem',
+                  marginBottom: 18
+                }}
+              >
+                Demo projekt
               </div>
-              {!loading && <Trend value={usersTrend} />}
+
+              <h1
+                style={{
+                  fontSize: 'clamp(2rem, 4vw, 3.4rem)',
+                  lineHeight: 1.05,
+                  fontWeight: 800,
+                  letterSpacing: '-0.03em',
+                  marginBottom: 16
+                }}
+              >
+                Dashboard mini
+              </h1>
+
+              <p
+                style={{
+                  color: 'rgba(255,255,255,0.78)',
+                  fontSize: '1.08rem',
+                  maxWidth: 760,
+                  marginBottom: 28
+                }}
+              >
+                Ukázkový dashboard projekt pro portfolio. Cílem je ukázat moderní UI,
+                práci s KPI kartami, grafem návštěvnosti a připraveností na napojení
+                backendu a reálných dat.
+              </p>
+
+              <div className="d-flex flex-wrap gap-2 mb-4">
+                {['Next.js', 'Recharts', 'Bootstrap', 'Demo data'].map((item) => (
+                  <span
+                    key={item}
+                    style={{
+                      padding: '8px 12px',
+                      borderRadius: 999,
+                      background: 'rgba(255,255,255,0.08)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      color: 'rgba(255,255,255,0.88)',
+                      fontSize: '0.92rem',
+                      fontWeight: 600
+                    }}
+                  >
+                    {item}
+                  </span>
+                ))}
+              </div>
+
+              <div className="d-flex flex-wrap gap-3">
+                <Link href="/dashboard" className="btn btn-primary btn-lg">
+                  Otevřít dashboard
+                </Link>
+
+                <Link href="/o-projektu" className="btn btn-outline-light btn-lg">
+                  O projektu
+                </Link>
+
+                <Link href="/kontakt" className="btn btn-outline-light btn-lg">
+                  Kontakt
+                </Link>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="col-6 col-md-3">
-          <div className="card shadow border-0 h-100">
-            <div className="card-body" style={{ padding: '14px 16px' }}>
-              <div className="text-muted small" style={{ letterSpacing: '.2px' }}>Revenue</div>
-              <div className="fs-4 fw-bold" style={{ lineHeight: 1.1 }}>
-                {loading ? '…' : formatCurrencyCZK(revenueValue)}
-              </div>
-              {!loading && <Trend value={revenueTrend} />}
-            </div>
-          </div>
-        </div>
-
-        <div className="col-6 col-md-3">
-          <div className="card shadow border-0 h-100">
-            <div className="card-body" style={{ padding: '14px 16px' }}>
-              <div className="text-muted small" style={{ letterSpacing: '.2px' }}>Orders</div>
-              <div className="fs-4 fw-bold" style={{ lineHeight: 1.1 }}>
-                {loading ? '…' : formatNumber(ordersValue)}
-              </div>
-              {!loading && <Trend value={ordersTrend} />}
-            </div>
-          </div>
-        </div>
-
-        <div className="col-6 col-md-3">
-          <div className="card shadow border-0 h-100">
-            <div className="card-body" style={{ padding: '14px 16px' }}>
-              <div className="text-muted small" style={{ letterSpacing: '.2px' }}>Conversion</div>
-              <div className="fs-4 fw-bold" style={{ lineHeight: 1.1 }}>
-                {loading ? '…' : `${convValue}%`}
-              </div>
-              {!loading && <Trend value={convTrend} />}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* CHART + SUMMARY */}
-      <div className="row g-3">
-        <div className="col-lg-8">
-          <div className="card shadow-sm">
-            <div className="card-body">
-              <h5 className="card-title">Návštěvnost</h5>
-
-              <div style={{ width: '100%', height: 300 }}>
-                <ResponsiveContainer>
-                  <LineChart data={stats}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="day" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="visits"
-                      stroke="#0d6efd"
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+          <div className="row g-3 mt-3">
+            <div className="col-md-4">
+              <div className="card shadow-sm border-0 h-100">
+                <div className="card-body">
+                  <div className="text-muted small mb-2">Co ukazuje</div>
+                  <h3 className="h5 mb-2">UI dashboardu</h3>
+                  <p className="mb-0 text-muted">
+                    KPI karty, layout, práce s obsahem, přehled a čitelnost na desktopu i mobilu.
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="col-lg-4">
-          <div className="card shadow-sm">
-            <div className="card-body">
-              <h5 className="card-title">Souhrn</h5>
-              <ul className="list-unstyled mb-0">
-                <li>Průměrná návštěvnost: <strong>{average}</strong></li>
-                <li>Dny: <strong>{stats.length}</strong></li>
-              </ul>
+            <div className="col-md-4">
+              <div className="card shadow-sm border-0 h-100">
+                <div className="card-body">
+                  <div className="text-muted small mb-2">Pro portfolio</div>
+                  <h3 className="h5 mb-2">Live demo</h3>
+                  <p className="mb-0 text-muted">
+                    Projekt běží online a je připravený jako ukázka pro klienty i budoucí rozšíření.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="col-md-4">
+              <div className="card shadow-sm border-0 h-100">
+                <div className="card-body">
+                  <div className="text-muted small mb-2">Další krok</div>
+                  <h3 className="h5 mb-2">Napojení backendu</h3>
+                  <p className="mb-0 text-muted">
+                    Aktuálně používá demo data. Později lze připojit reálné API a autentizaci.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
